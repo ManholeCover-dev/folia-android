@@ -203,7 +203,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
     .slice(0, 12)}`;
 
   return {
-    base: process.env.ELECTRON === 'true' ? './' : '/',
+    base: process.env.ELECTRON === 'true' || process.env.FOLIA_BUILD_TARGET === 'capacitor' ? './' : '/',
     worker: {
       format: 'es'
     },
@@ -270,7 +270,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
       traditionalLocalePlugin(),
       icuFoliaDataPlugin(),
       react(),
-      VitePWA({
+      ...(process.env.FOLIA_BUILD_TARGET === 'capacitor' ? [] : [VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['icon.svg'],
         devOptions: {
@@ -312,7 +312,7 @@ export default async function viteConfig(_config: ConfigEnv): Promise<UserConfig
             }
           ]
         }
-      })
+      })])
     ],
     define: {
       '__COMMIT_HASH__': JSON.stringify(commitHash + commitSuffix),

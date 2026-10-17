@@ -1,0 +1,12 @@
+{
+  "name": "folia-android-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Music API dependencies embedded in the Android application",
+  "engines": { "node": ">=24" },
+  "dependencies": {
+    "@neteasecloudmusicapienhanced/api": "4.41.1",
+    "kugoumusicapi": "https://github.com/MakcRe/KuGouMusicApi/archive/refs/tags/v1.6.0.tar.gz"
+  },
+  "overrides": { "axios": "1.20.0" }
+}

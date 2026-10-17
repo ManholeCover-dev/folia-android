@@ -91,3 +91,8 @@ __pycache__/
 
 # Built by build/buildPythonRuntime.mjs - binary artifacts that live on the mirrors, not in git.
 dist-runtime/
+
+# Downloaded mobile runtime and staged backend assets.
+packaging/android/runtime/
+android/app/src/main/jniLibs/
+android/app/src/main/assets/folia-backend/

@@ -166,6 +166,7 @@ import { usePlayerBottomBarOffset } from './hooks/usePlayerBottomBarOffset';
 import { usePlayerBottomBarPositioningEntry } from './hooks/usePlayerBottomBarPositioningEntry';
 import { PlayerBottomBarLayoutContext } from './components/floating-player/PlayerBottomBarLayoutContext';
 import { useFoliumHostBridge } from './mods/runtime/hostBridge';
+import { useAndroidShell } from './components/app/android/useAndroidShell';
 import { useFoliumHostActions } from './mods/runtime/hostActions';
 import { FoliumStageLayerSlot } from './mods/folium/registries/stageLayers';
 import { errorFields } from './utils/errorText';
@@ -655,6 +656,7 @@ export default function App() {
     // Folium: publish what is on screen to the main process (runtime snapshot
     // for main-side mods and the export service).
     useFoliumHostBridge(theme, isDaylight);
+    useAndroidShell(isDaylight);
 
     useThemeQuickEditorContext({
         aiTheme,

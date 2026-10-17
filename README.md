@@ -29,6 +29,8 @@ Lyrics Reimagined // 辞曲新境
 
 </div>
 
+> 本仓库维护基于 [Folia-major](https://github.com/chthollyphile/folia-major) 0.7.20 的非官方 Android 移植，安卓外壳参考 [Folia-Sonnet](https://github.com/chthollyphile/folia-sonnet)。已内置网易云与酷狗后端；[下载 ARM64 安卓预览版](https://github.com/ManholeCover-dev/folia-android/releases/tag/android-v0.7.20-preview.1)，安装、构建方法及已知限制见 [Android 说明](docs/android.md)。
+
 ## 项目简介
 
 Folia是一个以全屏沉浸式歌词播放为核心的在线音乐播放器，支持网易云、酷狗、QQ 音乐、Navidrome 和本地音乐库，桌面端还支持波点音乐、YouTube Music 和 Spotify，通过智能歌词匹配，AI生成配色主题，以及多种全屏歌词动画为用户提供独特的听歌体验。
@@ -148,6 +150,8 @@ Vercel 与 Cloudflare 上的 QQ 音乐不再需要额外部署一个常驻 API �
 目前推荐移动端用户部署 Web 版本/自托管版本之后，通过chrome for android / iOS Safari 创建 PWA应用（也就是将网页应用添加到桌面，Folia web版本支持安装为PWA应用）来使用。
 
 有一定技术的用户可以使用 capacitor 将本项目的web版本打包成为可安装的安卓apk，具体方法可参考示范仓库：[chthollyphile/folia-sonnet](https://github.com/chthollyphile/folia-sonnet)
+
+本仓库新增了包含网易云、酷狗音乐后端的实验性 Android 构建，范围与构建方法见 [Android 内置后端说明](docs/android.md)。
 
 ### 直接下载
 

@@ -17,6 +17,11 @@
   },
   "scripts": {
     "dev": "vite",
+    "build:capacitor": "cross-env FOLIA_BUILD_TARGET=capacitor vite build",
+    "android:runtime": "node packaging/android/fetchRuntime.mjs",
+    "android:backend": "node packaging/android/prepareBackend.mjs",
+    "cap:sync:android": "npm run android:runtime && npm run android:backend && npm run build:capacitor && cap sync android",
+    "build:android:debug": "npm run cap:sync:android && node packaging/android/buildAndroid.mjs assembleDebug",
     "dev:probe": "vite --open /dev-probe.html",
     "build": "npm run build:vercel-api && vite build",
     "build:vercel-api": "tsc -p api-ts/tsconfig.json",
@@ -231,6 +236,12 @@
     "youtubei.js": "18.1.0"
   },
   "devDependencies": {
+    "@capacitor/android": "8.4.2",
+    "@capacitor/core": "8.4.2",
+    "@capacitor/cli": "8.4.2",
+    "@capacitor/browser": "8.0.4",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.3",
     "@applemusic-like-lyrics/ttml": "^1.0.1",
     "@chenglou/pretext": "^0.0.9",
     "@emnapi/core": "1.11.3",

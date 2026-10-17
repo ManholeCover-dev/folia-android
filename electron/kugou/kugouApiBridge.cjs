@@ -365,6 +365,7 @@ function createKugouApiBridge({
 }
 
 module.exports = {
+  createDeviceCookies,
   LEGACY_SESSION_KEY,
   SESSION_KEY,
   createKugouApiBridge,

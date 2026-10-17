@@ -1,0 +1,19 @@
+Folia Android experimental port, based on Folia-major 0.7.20.
+Folia: https://github.com/chthollyphile/folia-major (AGPL-3.0)
+Android shell reference: https://github.com/chthollyphile/folia-sonnet (AGPL-3.0)
+
+Embedded Node runtime:
+https://github.com/fogtape/nodejs-mobile/releases/tag/v24.22.0-0
+This is a community prerelease built from an unreleased upstream proposal.
+Upstream source: nodejs/node@a5d0eb95dd03b90986ad1a7c0cd3f2de1a0f383c
+Mobile recipe: fogtape/nodejs-mobile@f6912558c2991852c0e756ea37ba34a0bfebaa78
+Archive SHA-256: 9b068f4ad4c755f26c04b31883c536f037a4831e6575847a699cdf5fa72dde25
+The corresponding Node license and bundled third-party notices are in nodeLicense.txt.
+The mobile adaptations use the same MIT license.
+
+Music API dependencies and their licenses are bundled with their individual
+packages under node_modules. Exact versions and integrity hashes are recorded
+in packaging/android/backend/package-lock.json in the matching source tree.
+
+This build includes music API adapters; recordings and membership entitlements
+are supplied by the respective services and are not included in the APK.

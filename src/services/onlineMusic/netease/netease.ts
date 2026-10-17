@@ -5,6 +5,7 @@ import type { PersonalFmRequestOptions, ProviderSongAvailability } from '../../.
 import { withLoginRequestLimit } from '../login/loginRequestLimit';
 import { withOnlineRequestLimit } from '../failure/onlineRequestLimit';
 import { errorFields } from '../../../utils/errorText';
+import { embeddedApiBase } from '../../android/backendFetch';
 
 type UnavailableSongReplacement = {
   replacementSong: SongResult;
@@ -28,6 +29,8 @@ const isElectronRuntime = () =>
   Boolean(getElectronBridge() && typeof getElectronBridge()?.getNeteasePort === 'function');
 
 const getConfiguredApiBase = () => {
+  const embedded = embeddedApiBase('netease');
+  if (embedded) return embedded;
   const viteEnv = typeof import.meta !== 'undefined' ? (import.meta as any).env : undefined;
   if (viteEnv && typeof viteEnv.VITE_NETEASE_API_BASE === 'string' && viteEnv.VITE_NETEASE_API_BASE) {
     return viteEnv.VITE_NETEASE_API_BASE;
