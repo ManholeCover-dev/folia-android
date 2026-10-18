@@ -3278,6 +3278,8 @@ export default {
     "recorderUnknownError": "Perekam mengalami kesalahan tidak dikenal."
   },
   "player": {
+    "collapseControls": "Ciutkan kontrol pemutaran",
+    "expandControls": "Bentangkan kontrol pemutaran",
     "play": "Putar",
     "pause": "Jeda",
     "like": "Suka",

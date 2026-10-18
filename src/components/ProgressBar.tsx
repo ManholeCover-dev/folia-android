@@ -21,6 +21,7 @@ interface ProgressBarProps {
     edgeStyle?: 'rounded' | 'square';
     /** The collapsed floating capsule: mod buttons with hideWhenCollapsed stay out. */
     collapsed?: boolean;
+    touchTarget?: boolean;
 }
 
 
@@ -43,6 +44,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     disabled = false,
     edgeStyle = 'rounded',
     collapsed = false,
+    touchTarget = false,
 }) => {
     const progressRef = useRef<HTMLDivElement>(null);
     const thumbRef = useRef<HTMLDivElement>(null);
@@ -202,7 +204,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
                     onInput={handleInput}
                     onChange={() => { }} // React requires this
                     onClick={(e) => e.stopPropagation()}
-                    className={`absolute inset-0 w-full h-full opacity-0 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                    className={`absolute ${touchTarget ? 'inset-x-0 top-1/2 h-11 -translate-y-1/2 touch-none' : 'inset-0 h-full'} w-full opacity-0 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 />
                 <FoliumProgressLayers ctx={foliumCtx} />
             </div>

@@ -3376,6 +3376,8 @@ export default {
     "recorderUnknownError": "录制器发生未知错误。",
   },
   "player": {
+    "collapseControls": "收起播放控件",
+    "expandControls": "展开播放控件",
     "play": "播放",
     "pause": "暂停",
     "like": "收藏",

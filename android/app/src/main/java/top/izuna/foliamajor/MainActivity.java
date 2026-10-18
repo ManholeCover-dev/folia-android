@@ -8,6 +8,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(FoliaBackendPlugin.class);
+        registerPlugin(FoliaShellPlugin.class);
         super.onCreate(savedInstanceState);
         BackendRuntime.ensureStarted(getApplicationContext());
     }

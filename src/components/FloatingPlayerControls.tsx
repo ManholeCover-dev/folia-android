@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, ChevronUp } from 'lucide-react';
 import { MotionValue } from 'framer-motion';
 import ProgressBar from './ProgressBar';
 import { PlayerState, LyricData, Theme } from '../types';
@@ -16,6 +16,9 @@ import { usePlayerChromeSettingsStore } from '../stores/usePlayerChromeSettingsS
 import { PLAYER_BOTTOM_BAR_BASE_OFFSET_PX, clampPlayerBottomBarOffset, resolvePlayerBottomBarMaxOffset } from '../utils/playerBottomBarLayout';
 import type { PlayerControlSlotActionId, PlayerControlSlotContext } from './floating-player/playerControlSlotActions';
 import { usePlayerOverlayObstacle } from '../hooks/usePlayerOverlayLayout';
+import { useMediaQuery } from '../hooks/useMediaQuery';
+import { isAndroidRuntime } from '../services/android/backendFetch';
+import TouchPlayerControls from './floating-player/TouchPlayerControls';
 
 export interface TrackNavigation {
     /** 当前曲目的稳定身份，用于识别「确实换歌了」；相邻两首同名时标题字符串不变，不能拿标题判断 */
@@ -151,8 +154,13 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
     ));
 
     const canAutoExpand = canTogglePlay && duration > 0;
+    const hasTouchPointer = useMediaQuery('(hover: none), (pointer: coarse)');
+    const useTouchControls = isAndroidRuntime() || hasTouchPointer;
+    const [isTouchExpanded, setIsTouchExpanded] = useState(currentView !== 'home');
     // 定位模式强制展开：用户要看到的是最终形态的胶囊，而不是一条细进度条。
-    const showExpanded = isPositioning || isHovered || (canAutoExpand && playerState !== PlayerState.PLAYING && currentView !== 'home');
+    const showExpanded = isPositioning || (useTouchControls
+        ? isTouchExpanded
+        : isHovered || (canAutoExpand && playerState !== PlayerState.PLAYING && currentView !== 'home'));
 
     // 上限依赖视口高度，窗口变矮时要跟着收，否则虚线框会画到屏幕外。
     useEffect(() => {
@@ -275,6 +283,7 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
     }, []);
 
     const handleMouseEnter = () => {
+        if (useTouchControls) return;
         if (collapseTimeoutRef.current !== null) {
             window.clearTimeout(collapseTimeoutRef.current);
             collapseTimeoutRef.current = null;
@@ -291,6 +300,7 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
     };
 
     const handleMouseLeave = () => {
+        if (useTouchControls) return;
         if (expandTimeoutRef.current !== null) {
             window.clearTimeout(expandTimeoutRef.current);
             expandTimeoutRef.current = null;
@@ -309,6 +319,10 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
     const handleClick = () => {
         if (isPositioning) {
             return;
+        }
+        if (useTouchControls && !isTouchExpanded) {
+            setIsTouchExpanded(true);
+            if (currentView !== 'home') return;
         }
         if (currentView !== 'lattice') {
             onNavigateToPlayer();
@@ -332,7 +346,7 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
             */}
             <motion.div
                 className={`absolute left-1/2 -translate-x-1/2 z-60 w-full flex justify-center pointer-events-none
-                    ${currentView === 'home'
+                    ${currentView === 'home' && !(useTouchControls && showExpanded)
                         ? 'max-w-[calc(100vw-120px)] md:max-w-[min(calc(32rem_+_var(--folium-player-bar-extra,0px)),calc(100vw-120px))]'
                         : 'max-w-[min(calc(32rem_+_var(--folium-player-bar-extra,0px)),100vw)] px-4'}`}
                 style={{ bottom: bottomBarBottomPx }}
@@ -378,9 +392,9 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
                         onPointerUp={handlePositionDragEnd}
                         onPointerCancel={handlePositionDragEnd}
                         style={{ touchAction: isPositioning ? 'none' : undefined }}
-                        className={`backdrop-blur-xl shadow-2xl overflow-hidden rounded-full relative transition-colors duration-300
+                        className={`backdrop-blur-xl shadow-2xl overflow-hidden ${useTouchControls && showExpanded ? 'rounded-3xl' : 'rounded-full'} relative transition-colors duration-300
                             ${isPositioning ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}
-                            ${showExpanded ? `p-3 ${glassBgExpanded} w-full` : `px-4 py-2 ${glassBgCollapsed} ${COLLAPSED_WIDTH_CLASS}`}`}
+                            ${showExpanded ? `p-3 ${glassBgExpanded} w-full` : `px-4 py-2 ${glassBgCollapsed} ${useTouchControls ? 'w-full max-w-sm' : COLLAPSED_WIDTH_CLASS}`}`}
                     >
                         <motion.div
                             layout
@@ -390,6 +404,8 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
                         >
                             {showExpanded ? (
                                 <ExpandedView
+                                    useTouchControls={useTouchControls}
+                                    onCollapse={() => setIsTouchExpanded(false)}
                                     currentSong={currentSong}
                                     playerState={playerState}
                                     currentTime={currentTime}
@@ -411,6 +427,7 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
                                 />
                             ) : (
                                 <CollapsedView
+                                    onExpand={useTouchControls ? () => setIsTouchExpanded(true) : undefined}
                                     currentTime={currentTime}
                                     duration={duration}
                                     onSeek={onSeek}
@@ -462,6 +479,8 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
 
 // 展开视图组件
 interface ExpandedViewProps {
+    useTouchControls: boolean;
+    onCollapse: () => void;
     currentSong: { name: string; } | null;
     playerState: PlayerState;
     currentTime: MotionValue<number>;
@@ -483,6 +502,8 @@ interface ExpandedViewProps {
 }
 
 const ExpandedView: React.FC<ExpandedViewProps> = ({
+    useTouchControls,
+    onCollapse,
     currentSong,
     playerState,
     currentTime,
@@ -502,6 +523,14 @@ const ExpandedView: React.FC<ExpandedViewProps> = ({
     slotSecondary,
     slotContext,
 }) => {
+    if (useTouchControls) {
+        return <TouchPlayerControls {...{
+            currentSong, playerState, currentTime, duration, canTogglePlay, onSeek, onTogglePlay,
+            noTrackText, primaryColor, secondaryColor, trackColor, isDaylight, controlsDisabled,
+            trackNavigation, slotPrimary, slotSecondary, slotContext, onCollapse,
+        }} />;
+    }
+
     return (
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-2 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
             {/* Desktop Layout - responsive grid positions apply from the sm breakpoint */}
@@ -590,6 +619,7 @@ const ExpandedView: React.FC<ExpandedViewProps> = ({
 
 // 折叠视图组件
 interface CollapsedViewProps {
+    onExpand?: () => void;
     currentTime: MotionValue<number>;
     duration: number;
     onSeek: (time: number) => void;
@@ -600,6 +630,7 @@ interface CollapsedViewProps {
 }
 
 const CollapsedView: React.FC<CollapsedViewProps> = ({
+    onExpand,
     currentTime,
     duration,
     onSeek,
@@ -608,8 +639,24 @@ const CollapsedView: React.FC<CollapsedViewProps> = ({
     trackColor,
     controlsDisabled = false,
 }) => {
+    const { t } = useTranslation();
     return (
-        <div className="flex items-center w-full justify-center h-8 px-4">
+        <div className={`flex items-center w-full justify-center ${onExpand ? 'h-11 gap-2' : 'h-8 px-4'}`}>
+            {onExpand && (
+                <button
+                    type="button"
+                    aria-label={t('player.expandControls')}
+                    aria-expanded={false}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full active:bg-white/15"
+                    style={{ color: primaryColor }}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onExpand();
+                    }}
+                >
+                    <ChevronUp size={20} />
+                </button>
+            )}
             <ProgressBar
                 currentTime={currentTime}
                 duration={duration}
@@ -619,6 +666,7 @@ const CollapsedView: React.FC<CollapsedViewProps> = ({
                 trackColor={trackColor}
                 disabled={controlsDisabled}
                 collapsed
+                touchTarget={!!onExpand}
             />
         </div>
     );

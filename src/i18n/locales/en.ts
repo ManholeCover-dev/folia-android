@@ -3377,6 +3377,8 @@ export default {
     "recorderUnknownError": "Recorder encountered an unknown error.",
   },
   "player": {
+    "collapseControls": "Collapse playback controls",
+    "expandControls": "Expand playback controls",
     "play": "Play",
     "pause": "Pause",
     "like": "Like",
