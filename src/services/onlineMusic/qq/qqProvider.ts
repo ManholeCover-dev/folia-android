@@ -15,6 +15,7 @@ import type {
 import { OnlineProviderError } from '../../../types/onlineMusic';
 import { createProviderSongMetadata } from '../../../utils/songMetadata';
 import { toSafePlaybackUrl } from '../../../utils/appPlaybackHelpers';
+import { toQqAndroidPlaybackUrl } from './qqAndroidPlayback';
 import { fetchQQLyrics } from './qqLyricProvider';
 import { writeProviderSessionValue } from '../providerStorage';
 import { normalizeQqCollection, normalizeQqSong, normalizeQqUser } from './qqNormalize';
@@ -321,7 +322,7 @@ const getAudioSource = async (song: SongResult, quality: AudioQualityPreference)
             const direct = playUrlMap[songmid];
             const fallback = Object.values(playUrlMap)[0] as any;
             const entry = direct ?? fallback;
-            const url = toSafePlaybackUrl(String(direct?.url || fallback?.url || ''));
+            const url = toQqAndroidPlaybackUrl(toSafePlaybackUrl(String(direct?.url || fallback?.url || '')) || '');
             if (url) {
                 return {
                     url,
