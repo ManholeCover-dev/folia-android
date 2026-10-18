@@ -14,6 +14,9 @@ The mobile adaptations use the same MIT license.
 Music API dependencies and their licenses are bundled with their individual
 packages under node_modules. Exact versions and integrity hashes are recorded
 in packaging/android/backend/package-lock.json in the matching source tree.
+QQ Music: @yakult-green-tea/qq-music-api 3.3.1 (MIT),
+https://github.com/yakult-green-tea/qq-music-api; its LICENSE and ATTRIBUTION.md
+are included in the APK's dependency assets.
 
 This build includes music API adapters; recordings and membership entitlements
 are supplied by the respective services and are not included in the APK.

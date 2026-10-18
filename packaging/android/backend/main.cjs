@@ -14,9 +14,11 @@ process.chdir(dataDirectory);
 require('axios').defaults.timeout = 30_000;
 const { createNeteaseProvider } = require('./netease/index.cjs');
 const { createKugouProvider } = require('./kugou/index.cjs');
+const { createQqProvider } = require('./qq/index.cjs');
 const providers = {
     netease: createNeteaseProvider(dataDirectory),
     kugou: createKugouProvider(dataDirectory),
+    qq: createQqProvider(dataDirectory),
 };
 const server = createEmbeddedServer({ token, providers });
 server.requestTimeout = 65_000;

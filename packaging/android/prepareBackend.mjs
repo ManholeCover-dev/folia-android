@@ -19,7 +19,7 @@ if (path.relative(root, destination).replace(/\\/g, '/') !== 'android/app/src/ma
 }
 await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
-for (const item of ['main.cjs', 'server.cjs', 'lyricProxy.cjs', 'netease', 'kugou', 'node_modules', 'package.json']) {
+for (const item of ['main.cjs', 'server.cjs', 'lyricProxy.cjs', 'netease', 'kugou', 'qq', 'node_modules', 'package.json']) {
     await cp(path.join(source, item), path.join(destination, item), { recursive: true, filter: file => !path.basename(file).startsWith('.') });
 }
 for (const item of ['electron/netease/neteaseApiStartup.cjs', 'electron/netease/lazyJsdom.cjs', 'electron/kugou/kugouApiBridge.cjs', 'electron/backendLifecycle.cjs', 'shared/networkErrorText.cjs']) {

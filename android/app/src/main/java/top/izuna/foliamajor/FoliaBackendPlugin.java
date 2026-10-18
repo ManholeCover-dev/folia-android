@@ -20,7 +20,7 @@ public class FoliaBackendPlugin extends Plugin {
     public void request(PluginCall call) {
         String route = call.getString("path", "");
         String method = call.getString("method", "GET");
-        if (!(route.startsWith("/netease/") || route.startsWith("/kugou/") || route.equals("/_health") || route.startsWith("/lyric-proxy?"))
+        if (!(route.startsWith("/netease/") || route.startsWith("/kugou/") || route.startsWith("/qq/") || route.equals("/_health") || route.startsWith("/lyric-proxy?"))
                 || route.contains("\\") || route.contains("#") || route.contains("\r") || route.contains("\n")
                 || !(method.equals("GET") || method.equals("POST"))) {
             call.reject("Unsupported embedded backend request");
@@ -39,13 +39,13 @@ public class FoliaBackendPlugin extends Plugin {
                     connection = (HttpURLConnection) uri.toURL().openConnection();
                     connection.setInstanceFollowRedirects(false);
                     connection.setConnectTimeout(5_000);
-                    connection.setReadTimeout(60_000);
+                    connection.setReadTimeout(80_000);
                     connection.setRequestMethod(method);
                     JSObject headers = call.getObject("headers", new JSObject());
                     for (var iterator = headers.keys(); iterator.hasNext();) {
                         String name = iterator.next();
                         String normalized = name.toLowerCase(java.util.Locale.ROOT);
-                        if (java.util.Arrays.asList("user-agent", "accept", "kg-rec", "kg-rc", "kg-clienttimems", "mid", "x-router").contains(normalized)) {
+                        if (java.util.Arrays.asList("user-agent", "accept", "kg-rec", "kg-rc", "kg-clienttimems", "mid", "x-router", "x-qq-session").contains(normalized)) {
                             connection.setRequestProperty(name, headers.getString(name));
                         }
                     }

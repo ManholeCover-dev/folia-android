@@ -1,6 +1,6 @@
 # Android 内置音乐后端版本
 
-本移植基于 [Folia-major](https://github.com/chthollyphile/folia-major) 0.7.20，安卓外壳参考 [Folia-Sonnet](https://github.com/chthollyphile/folia-sonnet)。这是非官方移植，保留上游项目的许可证和署名。APK 同时包含界面、Node.js 运行环境、网易云与酷狗接口库，使用音乐功能不需要另外部署服务器。
+本移植基于 [Folia-major](https://github.com/chthollyphile/folia-major) 0.7.20，安卓外壳参考 [Folia-Sonnet](https://github.com/chthollyphile/folia-sonnet)。这是非官方移植，保留上游项目的许可证和署名。APK 同时包含界面、Node.js 运行环境、网易云、酷狗与 QQ 音乐接口库，使用音乐功能不需要另外部署服务器。
 
 移植基线提交：`0a33f3836935bf0db88b2e341b02d295da96fb33`。本次保存源码时保留了该提交之前的上游历史。
 
@@ -8,11 +8,12 @@
 
 - 网易云：复用现有搜索、登录、歌曲、歌单和歌词界面，并保留桌面端的扫码登录修复。
 - 酷狗：复用现有 provider，内置稳定设备身份与设备注册逻辑。
+- QQ 音乐：复用桌面版的搜索、歌单、歌词和播放流程，内置同版本的 Node 后端，提供 QQ 与微信扫码入口。设备身份与加密登录会话放在应用私有目录，升级保留；原生请求通道传递会话，账号权限仍由平台决定。
 - 歌词、封面和匿名搜索代理也在手机内运行。
 - 登录状态沿用应用自己的 provider 存储，运行文件放在应用私有目录。
 - 后端只监听 `127.0.0.1` 的随机端口，每次进程启动生成新的访问令牌；界面通过原生插件调用，不开放局域网服务。
 
-这是实验性安卓移植。后台/锁屏连续播放、通知栏媒体控制、本地目录扫描仍待适配。QQ、波点、YouTube Music、Spotify 和 AI 主题服务尚未移植进手机后端。AI 在线模型仍需要用户配置相应服务和凭据。
+这是实验性安卓移植。后台/锁屏连续播放、通知栏媒体控制、本地目录扫描仍待适配。波点、YouTube Music、Spotify 和 AI 主题服务尚未移植进手机后端。AI 在线模型仍需要用户配置相应服务和凭据。
 
 在线平台的登录、风控及歌曲播放权限仍由平台决定。匿名搜索成功不代表所有歌曲都能匿名播放。
 
@@ -37,6 +38,8 @@ npm run build:android:debug
 
 本次提供的安装包是调试版。自行在其他电脑重建时，调试签名通常不同，可能无法直接覆盖已有安装；需要持续更新时应在本地妥善保存签名密钥。密钥、登录信息、SDK 和下载的运行环境不随源码上传。
 
+第二个预览版的 Android `versionCode` 为 2，继续使用第一版的应用标识和本机调试签名，可直接覆盖安装。保留应用数据即可保留已有网易云登录；请勿先卸载旧版。
+
 ## 运行环境来源
 
 采用社区项目 [fogtape/nodejs-mobile](https://github.com/fogtape/nodejs-mobile) 的 `24.22.0-0` **预发布构建**，对应未正式发布的 Node 上游提案。下载版本、地址和 SHA-256 固定在 `packaging/android/fetchRuntime.mjs`，包含 Android 16 KB 内存页支持；它不等同于 Node.js Mobile 官方稳定版。
@@ -48,12 +51,13 @@ npm run build:android:debug
 - 安卓原生启动及请求通道：`android/app/src/main/java/top/izuna/foliamajor/`。
 - Node 原生桥接：`android/app/src/main/cpp/`。
 - 精简后端及打包脚本：`packaging/android/`。
+- QQ 内嵌路由和会话持久化：`packaging/android/backend/qq/index.cjs`。它挂载锁定版本的 Node 路由，不加载会另开监听端口的包入口；升级依赖时须核对内部路径及扫码、会话契约。
 - 界面请求通道：`src/services/android/backendFetch.ts`。
 - 安卓系统栏和安全区域：`src/components/app/android/`。
 
 ```powershell
 npm run typecheck
-npm run test:unit -- test/unit/android test/unit/electron/kugouApiBridge.test.ts test/unit/onlineMusic/kugouTransport.test.ts test/unit/onlineMusic/omniArchitecture.test.ts
+npm run test:unit -- test/unit/android test/unit/onlineMusic/qqTransport.test.ts test/unit/onlineMusic/qqProvider.test.ts test/unit/onlineMusic/omniArchitecture.test.ts
 npm run android:backend
 node test/manual/androidBackendSmoke.mjs
 ```
@@ -68,3 +72,5 @@ node test/manual/androidBackendSmoke.mjs
 - 在应用界面搜索网易云歌曲、加载歌词并播放，音频进度正常推进；所测歌曲由平台限制为试听，界面正确显示了试听提示。
 - 2026-10-18，用户在真机确认网易云账号登录、歌词显示和前台有声播放正常；此前的无声现象在断开手机与电脑的 USB 连接后消失，本次未修改播放代码。
 - 酷狗匿名搜索及歌词接口成功；所测播放请求返回设备验证错误 20028，尚未完成真实账号登录和播放验证。
+- QQ 适配相关 164 项单元测试通过，另以独立进程验证会话加密密钥在重启后保持不变。
+- 在 APK 的原生通道中确认 QQ 与微信二维码均能生成、匿名歌曲和专辑搜索返回结果、歌词接口返回歌词；QQ 账号登录后的歌单、音源和真机播放仍待验证。匿名样本未返回播放地址，不据此推断歌曲已下架或账号权限。

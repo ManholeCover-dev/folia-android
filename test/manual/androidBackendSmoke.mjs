@@ -30,6 +30,32 @@ try {
     };
     const health = await request('/_health');
     console.info('health', { status: health.status, ...health.body });
+    const channels = await request('/qq/login/channels');
+    console.info('qq channels', { status: channels.status, channels: channels.body.data?.channels });
+    if (!['qq', 'wechat'].every(channel => channels.body.data?.channels?.includes(channel))) throw new Error('QQ login channels are missing');
+    for (const channel of ['qq', 'wechat']) {
+        const answer = await request('/qq/login/qr/key', { channel });
+        const key = answer.body.data?.unikey;
+        const image = key ? await request('/qq/login/qr/create', { key }) : null;
+        console.info('qq qr', { channel, keyStatus: answer.status, hasKey: Boolean(key), imageStatus: image?.status,
+            hasImage: Boolean(image?.body.data?.qrimg || image?.body.data?.qrurl),
+            failureStage: answer.body.failureStage, message: key ? undefined : answer.body.message });
+        if (key) await request('/qq/login/qr/cancel', { key });
+        if (!key || !(image?.body.data?.qrimg || image?.body.data?.qrurl)) throw new Error(`QQ ${channel} QR generation failed`);
+    }
+    const qqSearch = await request('/qq/search', { keyword: '月亮代表我的心', type: 'album', limit: '3' });
+    console.info('qq catalog search', { status: qqSearch.status, count: qqSearch.body.items?.length ?? 0, errorKey: qqSearch.body.errorKey });
+    const qqMid = '003rJSwm3TechU'; // Public song mid used by the pinned package's own route examples.
+    const qqLyrics = await request('/qq/getLyric', { songmid: qqMid });
+    const qqAudio = await request(`/qq/getMusicPlay/${qqMid}`, { quality: '128' });
+    const qqUrl = qqAudio.body.data?.playUrl?.[qqMid]?.url;
+    console.info('qq lyrics/audio', { lyricStatus: qqLyrics.status,
+        hasLyrics: Boolean(qqLyrics.body.response?.lyric || qqLyrics.body.lyric), audioStatus: qqAudio.status, hasUrl: Boolean(qqUrl) });
+    if (qqUrl) {
+        const stream = await fetch(qqUrl.replace(/^http:/, 'https:'), { headers: { Range: 'bytes=0-1023', Origin: 'https://localhost' }, signal: AbortSignal.timeout(20_000) });
+        console.info('qq media range', { status: stream.status, cors: stream.headers.get('access-control-allow-origin'), contentType: stream.headers.get('content-type') });
+        await stream.body?.cancel();
+    }
     const qr = await request('/netease/login/qr/create', { key: 'local-image-smoke-test', qrimg: 'true' });
     if (!qr.body.data?.qrimg?.startsWith('data:image/png')) throw new Error('NetEase QR generation failed');
     const ncm = await request('/netease/search', { keywords: '月亮代表我的心', limit: '3' });

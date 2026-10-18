@@ -32,6 +32,12 @@ function createEmbeddedServer({ token, providers }) {
             }
             const [, providerId, ...segments] = url.pathname.split('/');
             const provider = Object.hasOwn(providers, providerId) ? providers[providerId] : null;
+            // Some providers own their HTTP router (path parameters, headers and POST contracts).
+            // Hand over the untouched body stream only after the loopback authentication check.
+            if (provider?.handle && segments.length) {
+                await provider.handle(req, res, url);
+                return;
+            }
             if (!provider || !segments.length || segments.some(part => !/^[a-zA-Z0-9_]+$/.test(part))) {
                 send(404, { code: 404, message: 'Unknown music API route' });
                 return;

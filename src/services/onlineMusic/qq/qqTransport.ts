@@ -2,6 +2,7 @@ import { OnlineProviderError } from '../../../types/onlineMusic';
 import { readProviderSessionValue, removeProviderSessionValue, writeProviderSessionValue } from '../providerStorage';
 import { withLoginRequestLimit } from '../login/loginRequestLimit';
 import { withOnlineRequestLimit } from '../failure/onlineRequestLimit';
+import { embeddedApiBase } from '../../android/backendFetch';
 
 // src/services/onlineMusic/qq/qqTransport.ts
 
@@ -81,6 +82,8 @@ export const QQ_ONLINE_REQUEST_LIMIT_MS = 70_000;
 const QR_CONFIRMED_CODE = 803;
 
 const getWebApiBase = (): string => {
+    const embedded = embeddedApiBase('qq');
+    if (embedded) return embedded;
     const viteValue = typeof import.meta !== 'undefined' && import.meta.env?.MODE !== 'test'
         ? String((import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_QQ_API_BASE || '')
         : '';
