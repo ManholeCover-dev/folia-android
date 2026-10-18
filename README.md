@@ -29,7 +29,9 @@ Lyrics Reimagined // 辞曲新境
 
 </div>
 
-> 本仓库维护基于 [Folia-major](https://github.com/chthollyphile/folia-major) 0.7.20 的非官方 Android 移植，安卓外壳参考 [Folia-Sonnet](https://github.com/chthollyphile/folia-sonnet)。已内置网易云、酷狗与 QQ 音乐后端；[下载 ARM64 安卓预览版](https://github.com/ManholeCover-dev/folia-android/releases/tag/android-v0.7.20-preview.4)，安装、构建方法及已知限制见 [Android 说明](docs/android.md)。
+> 本仓库维护基于 [Folia-major](https://github.com/chthollyphile/folia-major) 0.7.20 的非官方 Android 移植，安卓外壳参考 [Folia-Sonnet](https://github.com/chthollyphile/folia-sonnet)。已内置网易云、酷狗与 QQ 音乐后端；[下载 ARM64 Android Release](https://github.com/ManholeCover-dev/folia-android/releases/tag/android-v0.7.20)，安装、构建方法及已知限制见 [Android 说明](docs/android.md)。
+>
+> Release 使用独立正式签名；首次从预览版切换时需卸载测试版，并在安装后重新登录。
 
 ## 项目简介
 

@@ -22,6 +22,7 @@
     "android:backend": "node packaging/android/prepareBackend.mjs",
     "cap:sync:android": "npm run android:runtime && npm run android:backend && npm run build:capacitor && cap sync android",
     "build:android:debug": "npm run cap:sync:android && node packaging/android/buildAndroid.mjs assembleDebug",
+    "build:android:release": "npm run cap:sync:android && node packaging/android/buildAndroid.mjs assembleRelease",
     "dev:probe": "vite --open /dev-probe.html",
     "build": "npm run build:vercel-api && vite build",
     "build:vercel-api": "tsc -p api-ts/tsconfig.json",
